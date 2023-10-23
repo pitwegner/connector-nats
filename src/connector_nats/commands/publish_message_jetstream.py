@@ -6,8 +6,7 @@ import nats
 class PublishMessageJetStream:
     """Publish message on a NATS jetstream subject."""
 
-    def __init__(self, endpoint, username, password,
-                 subject, stream, message):
+    def __init__(self, endpoint, subject, stream, message, username=None, password=None):
         """
         :param endpoint: The endpoint to use.
         :param username: The username to authenticate with.

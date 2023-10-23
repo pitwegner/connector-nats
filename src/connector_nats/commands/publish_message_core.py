@@ -1,10 +1,11 @@
 """Publish message on a NATS core subject."""
 import nats
 
+
 class PublishMessageCore:
     """Publish message on a NATS core subject."""
 
-    def __init__(self, endpoint, username, password, subject, message):
+    def __init__(self, endpoint, subject, message, username=None, password=None):
         """
         :param endpoint: The endpoint to use.
         :param username: The username to authenticate with.
