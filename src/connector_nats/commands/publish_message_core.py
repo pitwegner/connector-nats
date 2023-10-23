@@ -1,5 +1,6 @@
 """Publish message on a NATS core subject."""
 import nats
+import asyncio
 
 
 class PublishMessageCore:
@@ -20,9 +21,11 @@ class PublishMessageCore:
         self.subject = subject
         self.message = message
 
-    async def execute(self, _config, _task_data):
+    def execute(self, _config, _task_data):
+        return asyncio.run(self.async_exec())
+
+    async def async_exec(self):
         status = 0
-        error = None
         try:
             nc = await nats.connect(
                 self.endpoint,
@@ -32,18 +35,14 @@ class PublishMessageCore:
             await nc.publish(self.subject, self.message.encode())
             status = 200
         except Exception as exception:
-            error = {"error_code": exception.__class__.__name__, "message": str(exception)}
-            status = 500
+            return {
+                "response": {"error": str(exception)},
+                "mimetype": "application/json",
+                "status": 500,
+            }
 
-        return_response = {
-            "body": "{}",
+        return {
+            "response": {},
             "mimetype": "application/json",
-            "http_status": status,
+            "status": status,
         }
-        result = {
-            "command_response": return_response,
-            "error": error,
-            "command_response_version": 2,
-
-        }
-        return result
