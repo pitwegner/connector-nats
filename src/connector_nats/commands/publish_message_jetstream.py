@@ -1,19 +1,13 @@
 """Publish message on a NATS jetstream subject."""
 import json
-from typing import Any
 import nats
 
-from spiffworkflow_connector_command.command_interface import CommandErrorDict
-from spiffworkflow_connector_command.command_interface import CommandResponseDict
-from spiffworkflow_connector_command.command_interface import ConnectorCommand
-from spiffworkflow_connector_command.command_interface import ConnectorProxyResponseDict
 
-
-class PublishMessageJetStream(ConnectorCommand):
+class PublishMessageJetStream:
     """Publish message on a NATS jetstream subject."""
 
-    def __init__(self, endpoint: str, username: str, password: str,
-                 subject: str, stream: str, message: str):
+    def __init__(self, endpoint, username, password,
+                 subject, stream, message):
         """
         :param endpoint: The endpoint to use.
         :param username: The username to authenticate with.
@@ -29,10 +23,10 @@ class PublishMessageJetStream(ConnectorCommand):
         self.stream = stream
         self.message = message
 
-    async def execute(self, _config: Any, _task_data: Any) -> ConnectorProxyResponseDict:
+    async def execute(self, _config, _task_data):
         command_response = {}
         status = 0
-        error: CommandErrorDict | None = None
+        error = None
         try:
             nc = await nats.connect(
                 self.endpoint,
@@ -48,12 +42,12 @@ class PublishMessageJetStream(ConnectorCommand):
             error = {"error_code": exception.__class__.__name__, "message": str(exception)}
             status = 500
 
-        return_response: CommandResponseDict = {
+        return_response = {
             "body": json.dumps(command_response),
             "mimetype": "application/json",
             "http_status": status,
         }
-        result: ConnectorProxyResponseDict = {
+        result = {
             "command_response": return_response,
             "error": error,
             "command_response_version": 2,
